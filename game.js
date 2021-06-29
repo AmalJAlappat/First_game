@@ -86,7 +86,7 @@ function animatePress(currentColour) {
   }, 100);
 }
 
-
+// Restart
 function restart(){
   $(document).keydown(function() {
     if (tog) {
