@@ -2,6 +2,7 @@ var gamePattern = [];
 var buttonColours = ["red", "blue", "green", "yellow"];
 var userClickedPattern = [];
 var setKey = true;
+var tog = true;
 var level = 0;
 var clk = 1;
 
@@ -10,7 +11,7 @@ $(document).keydown(function() {
   if (setKey) {
     nextSequence();
   }
-  setKey =false;
+  setKey = false;
 });
 
 $(".btn").click(function() {
@@ -18,13 +19,14 @@ $(".btn").click(function() {
   userClickedPattern.push(userChosenColour);
   playSound(userChosenColour);
   animatePress(userChosenColour);
- checkAnswer((userClickedPattern.length)-1);
+  checkAnswer((userClickedPattern.length) - 1,true);
 });
 
 
 
 // Sequence generator
 function nextSequence() {
+  tog = true;
   userClickedPattern = [];
   level++;
   $("#level-title").text("Level " + level);
@@ -40,26 +42,30 @@ function nextSequence() {
 
 
 // checkAnswer
-function checkAnswer(currentLevel){
+function checkAnswer(currentLevel) {
   if (gamePattern[currentLevel] === userClickedPattern[currentLevel]) {
 
-        console.log("success");
+    if (userClickedPattern.length === gamePattern.length) {
+      setTimeout(function() {
+ tog=true;
+        nextSequence();
+      }, 1000);
 
-        //4. If the user got the most recent answer right in step 3, then check that they have finished their sequence with another if statement.
-        if (userClickedPattern.length === gamePattern.length){
+    }
 
-          //5. Call nextSequence() after a 1000 millisecond delay.
-          setTimeout(function () {
-            nextSequence();
-          }, 1000);
+  } else {
 
-        }
+    playSound("wrong");
+    $("body").addClass("game-over");
+    setTimeout(function() {
+      $("body").removeClass("game-over");
+    }, 200);
+    $("h1").text("Game Over, Press Any Key to Restart");
+    gamePattern = [];
+    level = 0;
+    restart();
 
-      } else {
-
-        console.log("wrong");
-
-      }
+}
 
 
 }
@@ -76,17 +82,16 @@ function playSound(name) {
 function animatePress(currentColour) {
   $("#" + currentColour).addClass("pressed");
   setTimeout(function() {
-    $("#"+currentColour).removeClass("pressed");
-  },100);
+    $("#" + currentColour).removeClass("pressed");
+  }, 100);
 }
 
-// To check if arrays are equal
 
-// function compareArrays(arr1,arr2) {
-//   if (arr1.toString()==arr2.toString()) {
-//     compareArr=true;
-//   } else {
-//     compareArr=false;
-//   }
-//   return compareArr;
-// }
+function restart(){
+  $(document).keydown(function() {
+    if (tog) {
+      nextSequence();
+    }
+    tog = false;
+  });
+}
